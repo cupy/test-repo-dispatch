@@ -51,6 +51,7 @@ jobs:
 
   dispatch:
     needs: pre-dispatch
+    if: ${{ needs.pre-dispatch.outputs.sha != '' }}
     runs-on: ubuntu-latest
     steps:
     - name: Generate Token
