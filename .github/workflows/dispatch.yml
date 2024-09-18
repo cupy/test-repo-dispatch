@@ -8,6 +8,7 @@ env:
 jobs:
   dispatch:
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'kmaehashi'  # XXX
     steps:
     - name: Generate Token
       id: generate-token
@@ -23,3 +24,7 @@ jobs:
         repository: ${{ env.TARGET_REPO_OWNER }}/${{ env.TARGET_REPO_NAME }}
         event-type: rocm-ci
         token: ${{ steps.generate-token.outputs.token }}
+        client-payload: |
+          {
+            "sha": "451140c6fa15d2c1bee4dda49a769563136142e8"
+          }
