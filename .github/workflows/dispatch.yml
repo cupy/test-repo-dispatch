@@ -17,7 +17,10 @@ jobs:
     # TODO Support workflow_dispatch and push.
     - name: 'Handle Pull Request Comments'
       id: pull-request
-      if: github.event_name == 'issue_comment' && github.event.issue.pull_request
+      if: |
+        github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request &&
+        ( github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER' )
       uses: actions/github-script@v7
       with:
         script: |
@@ -75,5 +78,6 @@ jobs:
         client-payload: |
           {
             "head_sha": "${{ needs.pre-dispatch.outputs.head_sha }}",
-            "merge_commit_sha": "${{ needs.pre-dispatch.outputs.merge_commit_sha }}"
+            "merge_commit_sha": "${{ needs.pre-dispatch.outputs.merge_commit_sha }}",
+            "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }
