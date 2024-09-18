@@ -40,7 +40,9 @@ jobs:
               continue;
             }
             if (mergeable === true) {
-               core.setOutput('sha', pr.data.merge_commit_sha);
+              const sha = pr.data.merge_commit_sha;
+              core.setOutput('sha', sha);
+              console.log(`Pull request is mergable, target merge commit SHA: ${sha}`);
             } else {
               core.setFailed('The pull request is not mergeable.');
             }
