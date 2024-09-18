@@ -11,7 +11,8 @@ jobs:
     if: github.repository_owner == 'cupy'
     runs-on: ubuntu-latest
     outputs:
-      sha: ${{ steps.pull-request.outputs.sha }}
+      head_sha: ${{ steps.pull-request.outputs.head_sha }}
+      merge_commit_sha: ${{ steps.pull-request.outputs.merge_commit_sha }}
     steps:
     # TODO Support workflow_dispatch and push.
     - name: 'Handle Pull Request Comments'
@@ -23,6 +24,7 @@ jobs:
           // Check if the comment contain "/test rocm" request.
           const lines = context.payload.comment.body.split('\n');
           if (!lines.some(line => line.trim().startsWith('/test ') && line.includes('rocm'))) {
+            console.log('Dispatch not requested in pull request comment.');
             return;
           }
 
@@ -40,9 +42,11 @@ jobs:
               continue;
             }
             if (mergeable === true) {
-              const sha = pr.data.merge_commit_sha;
-              core.setOutput('sha', sha);
-              console.log(`Pull request is mergable, target merge commit SHA: ${sha}`);
+              const head_sha = pr.data.head.sha;
+              const merge_commit_sha = pr.data.merge_commit_sha;
+              core.setOutput('head_sha', head_sha);
+              core.setOutput('merge_commit_sha', merge_commit_sha);
+              console.log(`Target HEAD commit ${head_sha}, merge commit ${merge_commit_sha}`);
             } else {
               core.setFailed('The pull request is not mergeable.');
             }
@@ -51,7 +55,7 @@ jobs:
 
   dispatch:
     needs: pre-dispatch
-    if: ${{ needs.pre-dispatch.outputs.sha != '' }}
+    if: ${{ needs.pre-dispatch.outputs.head_sha != '' }}
     runs-on: ubuntu-latest
     steps:
     - name: Generate Token
@@ -70,5 +74,6 @@ jobs:
         token: ${{ steps.generate-token.outputs.token }}
         client-payload: |
           {
-            "sha": "${{ needs.pre-dispatch.outputs.sha }}"
+            "head_sha": "${{ needs.pre-dispatch.outputs.head_sha }}",
+            "merge_commit_sha": "${{ needs.pre-dispatch.outputs.merge_commit_sha }}"
           }
