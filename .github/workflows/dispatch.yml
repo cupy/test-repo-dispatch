@@ -35,7 +35,7 @@ jobs:
             });
             const mergeable = pr.data.mergeable;
             if (mergeable === null) {
-              // mergeable is null, wait until mergeability is determined.
+              console.log('Waiting for GitHub to determine mergeability...');
               await new Promise(r => setTimeout(r, 1000));
               continue;
             }
