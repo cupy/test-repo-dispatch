@@ -21,7 +21,7 @@ jobs:
       with:
         script: |
           // Check if the comment contain "/test rocm" request.
-          const comments = github.event.comment.body.split('\n');
+          const comments = context.payload.comment.body.split('\n');
           if (!lines.some(line => line.trim().startsWith('/test ') && line.includes('rocm'))) {
             return;
           }
